@@ -3,7 +3,7 @@ package com.codedm.java.basic.first;
 /**
  * 我的第一个Java程序
  *
- * @author Code-dm
+ * @author Codedm
  */
 public class HelloWorld {
 

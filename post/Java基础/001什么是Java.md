@@ -1,9 +1,10 @@
+---
 title: 什么是 Java
-date: 2022-07-24 00:00:00
 toc: true
 categories:
-- Java基础
-
+  - Java基础
+abbrlink: 9159529f
+date: 2022-07-24 00:00:00
 ---
 
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/2)

@@ -1,8 +1,10 @@
+---
 title: 第一个 Java 程序 - Hello World
-date: 2022-07-26 00:00:00
 toc: true
-categories: 
-- Java基础
+categories:
+  - Java基础
+abbrlink: 6913f6d4
+date: 2022-07-26 00:00:00
 ---
 
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/6)

@@ -1,7 +1,7 @@
 package com.codedm.java.generics;
 
 /**
- * @author Dongming WU
+ * @author Codedm
  */
 public class GenericsFunction<T, R> {
 

@@ -3,7 +3,7 @@ package com.codedm.java.basic.datatype;
 /**
  * Java 中基本数据类型
  *
- * @author Code-dm
+ * @author Codedm
  */
 public class PrimitiveDataType {
 

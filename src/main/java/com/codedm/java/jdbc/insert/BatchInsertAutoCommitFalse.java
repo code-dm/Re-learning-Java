@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * @author Dongming WU
+ * @author Codedm
  */
 public class BatchInsertAutoCommitFalse {
 

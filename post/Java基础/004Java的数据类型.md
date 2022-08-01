@@ -1,10 +1,13 @@
+---
 title: Java 的数据类型
-date: 2022-07-28 00:00:00
 toc: true
 excerpt: 本篇文章会详细讲解编程语言中的变量，以及Java中的int、double等。
-categories: 
-- Java基础
-cover: https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220730/c1a6452d9c8249298a9d7b1b38c27e37.png?x-oss-process=style/codedm
+categories:
+  - Java基础
+cover: >-
+  https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220730/c1a6452d9c8249298a9d7b1b38c27e37.png?x-oss-process=style/codedm
+abbrlink: f42f2ee6
+date: 2022-07-28 00:00:00
 ---
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/3)
 # 什么是变量

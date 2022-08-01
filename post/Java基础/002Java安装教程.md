@@ -1,10 +1,12 @@
+---
 title: Java 安装教程
-date: 2022-07-25 00:00:00
 toc: true
 excerpt: 这是一篇关于如何安装Java的教程
-categories: 
-- Java基础
+categories:
+  - Java基础
 cover: pi/Pasted%20image%2020220727213852.png
+abbrlink: 823e9fb
+date: 2022-07-25 00:00:00
 ---
 
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/1)
