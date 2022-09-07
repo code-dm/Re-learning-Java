@@ -12,5 +12,13 @@ date: 2022-07-24 00:00:00
 1. 创建一个配置文件目录，并新建一个``my.conf``文件
 2. 执行命令
 ```shell
-docker run -p 3306:3306 --name mysql -v 你创建的目录:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=123456 -d 镜像ID
+docker run -p 3306:3306 \
+--name mysql8 -v 你创建的目录:/etc/mysql/conf.d \
+-e MYSQL_ROOT_PASSWORD=123456 -d 镜像ID
 ```
+
+docker run \
+-p 33261:3306 \
+-e MYSQL_ROOT_PASSWORD=123456 \
+-d mysql:tag \
+--name some-mysql
