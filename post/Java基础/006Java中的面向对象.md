@@ -3,8 +3,10 @@ title: Java中的面向对象OOP
 toc: true
 categories:
   - Java基础
+cover: >-
+  https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220809/368fdfeac11741259485eb88646996a4.png?x-oss-process=style/codedm
+abbrlink: fd4a56f1
 date: 2022-08-08 23:02:00
-cover: https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220809/368fdfeac11741259485eb88646996a4.png?x-oss-process=style/codedm
 ---
 
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/7)

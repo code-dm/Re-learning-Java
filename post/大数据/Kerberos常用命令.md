@@ -2,8 +2,9 @@
 title: Kerberos常用命令
 toc: true
 categories:
-- 大数据
-  date: 2022-08-17 00:00:00
+  - 大数据
+abbrlink: 12990ea5
+date: 2022-08-17 00:00:00
 ---
 
 通过keytab文件查找Principal

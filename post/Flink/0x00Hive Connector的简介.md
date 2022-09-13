@@ -2,7 +2,8 @@
 title: Hive Connector 简介
 toc: true
 categories:
-- Flink
+  - Flink
+abbrlink: f3b4a32a
 date: 2022-09-07 11:00:00
 ---
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)

@@ -2,8 +2,9 @@
 title: Hive Connector 实战使用
 toc: true
 categories:
-- Flink
-  date: 2022-09-07 11:00:00
+  - Flink
+abbrlink: e220ca62
+date: 2022-09-07 11:00:00
 ---
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
 
@@ -70,3 +71,5 @@ CREATE CATALOG myhive WITH (
 | default-database | 否   | default | String | 当一个catalog被设为当前catalog时，所使用的默认当前database。                                                                                                |
 | hive-version     | 否   | (无)     | String | HiveCatalog 能够自动检测使用的 Hive 版本。我们建议不要手动设置 Hive 版本，除非自动检测机制失败。                                                                             |
 | hadoop-conf-dir  | 否   | (无)     | String | Hadoop 配置文件目录的路径。目前仅支持本地文件系统路径。我们推荐使用 HADOOP_CONF_DIR 环境变量来指定 Hadoop 配置。因此仅在环境变量不满足您的需求时再考虑使用该参数，例如当您希望为每个 HiveCatalog 单独设置 Hadoop 配置时。  |
+### 从MySQL中同步数据到Hive
+
