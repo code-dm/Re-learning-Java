@@ -1,3 +1,6 @@
+---
+abbrlink: '0'
+---
 Hello 大家好我是Codedm，这个仓库主要是和大家分享一些关于Java生态的技术。
 主要包括Java 基础、Java 进阶、Flink、大数据、算法、Java Web等等
 ## 文章导航

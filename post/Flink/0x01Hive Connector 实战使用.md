@@ -7,7 +7,7 @@ abbrlink: e220ca62
 date: 2022-09-07 11:00:00
 ---
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
-
+<!-- more -->
 > 本文基于：Flink-1.15
 # 准备工作
 ### 下载 Flink 安装包
