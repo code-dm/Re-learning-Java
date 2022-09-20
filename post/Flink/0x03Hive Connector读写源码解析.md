@@ -3,6 +3,7 @@ title: Hive Connector读写源码解析
 toc: true
 categories:
   - Flink
+abbrlink: 76537a8
 date: 2022-09-14 11:00:00
 ---
 [本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
@@ -21,6 +22,8 @@ Flink 支持以批和流两种模式从 Hive 表中读取数据。批读的时�
 | streaming-source.partition-order      | partition-name | 	String   | 	streaming source 分区排序，支持 create-time， partition-time 和 partition-name。 create-time 比较分区/文件创建时间， 这不是 Hive metastore 中创建分区的时间，而是文件夹/文件在文件系统的修改时间，如果分区文件夹以某种方式更新，比如添加在文件夹里新增了一个文件，它会影响到数据的使用。partition-time 从分区名称中抽取时间进行比较。partition-name 会比较分区名称的字典顺序。对于非分区的表，总是会比较 'create-time'。对于分区表默认值是 'partition-name'。该选项与已经弃用的 'streaming-source.consume-order' 的选项相同 |
 | streaming-source.consume-start-offset | None           | 	String   | 	流模式起始消费偏移量。如何解析和比较偏移量取决于你指定的顺序。对于 create-time 和 partition-time，会比较时间戳 (yyyy-[m]m-[d]d [hh:mm:ss])。对于 partition-time，将使用分区时间提取器从分区名字中提取的时间。 对于 partition-name，是字符串类型的分区名称(比如 pt_year=2020/pt_mon=10/pt_day=01)。                                                                                                                                              |
 # Flink 读取 Hive 原理
+![流程图](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220920/43be348a6c5d477eb991ae1f20019991.png?x-oss-process=style/codedm)
+
 ![HiveSource类依赖图](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220914/33c0117958164715aa805ab0e114dba4.png?x-oss-process=style/codedm)
 `HiveSource<T>`继承了`AbstractFileSource<T, HiveSourceSplit>`类，`AbstractFileSource`又实现了核心的`Source`接口。
 Hive表中是不存储数据的，所有数据存储在HDFS中，所以`HiveSource`继承了`AbstractFileSource`抽象类。
@@ -32,3 +35,79 @@ Hive表中是不存储数据的，所有数据存储在HDFS中，所以`HiveSour
 `org.apache.flink.connectors.hive.HiveSourceBuilder`类主要是通过配置信息构建`HiveSource`类。
 `HiveSourceBuilder`类中核心的方法：`buildWithBulkFormat`。
 ![buildHiveSource](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220915/826d0c38d3ba49739cef6263cdac7a09.png?x-oss-process=style/codedm)
+## HiveSource
+`HiveSource`构造方法中的参数：
+- `Path[] inputPaths`: 
+   文件系统中的一个目录或者一个文件，`buildHiveSource`传过来的参数是：`new Path[1]`
+- `FileEnumerator.Provider fileEnumerator`: 
+   一个可以创建`HiveSourceFileEnumerator`的工厂类
+- `FileSplitAssigner.Provider splitAssigner`: 
+   创建`FileSplitAssigner`工厂类
+- `BulkFormat<T, HiveSourceSplit> readerFormat`: 
+   首先了解什么是`BulkFormat`：`BulkFormat`是一个接口，`BulkFormat` 一次读取并解析一批记录。`BulkFormat`的实现包括`ORC Format`、`Parquet Format`、`HiveInputFormat`等。 
+   外部的`BulkFormat`类主要充当`reader`的配置持有者和工厂角色(用来创建`reader`的工厂)。`BulkFormat.Reader`是在`BulkFormat#createReader(Configuration, FileSourceSplit)`方法中创建的，然后完成读取操作。如果在流的`checkpoint`执行期间基于`checkpoint`创建`Bulk reader`，那么`reader`是在`BulkFormat#restoreReader(Configuration, FileSourceSplit)`方法中重新创建的。
+- `ContinuousEnumerationSettings continuousEnumerationSettings`: 
+   流式读取持续监控分区和文件的配置，包括监控的时间间隔。
+   如果是批量读取`continuousEnumerationSettings`为空，如果是流式读取`continuousEnumerationSettings`会被`new`出来。
+- `int threadNum`: 
+   用来限制最大创建监控Hive分区和文件的线程数，在`org.apache.flink.connectors.hive.MRSplitsGetter`类中`Executors.newFixedThreadPool(threadNum);`限制线程池的数量。
+   从`table.exec.hive.load-partition-splits.thread-num`中获取的参数。
+- `JobConf jobConf`: 
+   通过`HiveConf`转成的`JobConf`
+- `ObjectPath tablePath`: 
+  table/view/function的名称
+- `List<String> partitionKeys`: 
+   分区键
+- `ContinuousPartitionFetcher<Partition, ?> fetcher`: 
+   是一个Hive分区获取器，可以根据`previousOffset`获取之后的分区。需要利用`HiveContinuousPartitionFetcherContext-getComparablePartitionValueList`获取所有可比较的分区列表。
+- `HiveTableSource.HiveContinuousPartitionFetcherContext<?> fetcherContext`: 
+   ![FetcherContext](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220916/4cc600e281a7457fa02c85cf68a797ee.png?x-oss-process=style/codedm)
+   从`Hive`的`Meta Store`中获取表的分区的上下文。
+`HiveSource`继承`AbstractFileSource`类，`AbstractFileSource-createReader`会创建一个核心类`FileSourceReader`，用来读取分布式文件系统中的文件。
+`HiveSource-createEnumerator`会创建核心类`ContinuousHiveSplitEnumerator`(流式读取)或调用父类`createEnumerator`方法创建`StaticFileSplitEnumerator`(批方式读取)类。
+## ContinuousHiveSplitEnumerator
+![ContinuousHiveSplitEnumerator](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220919/0c6cbc82f92a49f4a49738e68a336683.png?x-oss-process=style/codedm)
+分区的发现分为初始化阶段和后续持续监控阶段，`ContinuousHiveSplitEnumerator`的作用是定时发现分布式文件系统中的分区。`ContinuousHiveSplitEnumerator`实现了`SplitEnumerator`类，程序会定时调用该类的`start()`方法用来监控分区。
+`start()`方法中`enumeratorContext.callAsync(monitor, this::handleNewSplits, discoveryInterval, discoveryInterval)`方法的入参：
+- monitor：回调类，会定期调用该类的`call()`方法
+- this::handleNewSplits：传入的是一个函数。用来处理`monitor`发现的新分区
+- discoveryInterval：初始化延迟时间
+- discoveryInterval：周期延迟时间
+### PartitionMonitor#call()方法
+![PartitionMonitor](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20220919/974ff4cb74214d30b6edf72e8afa8eda.png?x-oss-process=style/codedm)
+`call()`方法会获取表的所有分区，并过滤掉`currentReadOffset`位点之后的之前的旧分区。然后根据这些分区循环生成`HiveSourceSplit`，最终返回`NewSplitsAndState`。
+`NewSplitsAndState`中存储三个全局变量：
+- T offset: 最新的offset
+- Collection<List<String>> seenPartitions: 已经处理过的分区offset
+- Collection<HiveSourceSplit> newSplits: 监控到的新分区，如果没有监控到则为空
+## StaticFileSplitEnumerator
+`FileSource`批处理`SplitEnumerator`的具体实现。获取文件系统目录中所有文件并分配给`Reader`。`HiveSource`的批处理使用该类做处理。
+## FileSourceReader
+```
+public FileSourceReader(
+            SourceReaderContext readerContext,
+            BulkFormat<T, SplitT> readerFormat,
+            Configuration config) {
+        super(
+                () -> new FileSourceSplitReader<>(config, readerFormat),
+                new FileSourceRecordEmitter<>(),
+                config,
+                readerContext);
+    }
+```
+核心作用在构造方法中向父类传入`() -> new FileSourceSplitReader<>(config, readerFormat)`。真正调用读取逻辑的是`FileSourceSplitReader`
+## FileSourceSplitReader
+`FileSourceSplitReader`类中`fetch`方法调用批量读取方法：
+```
+@Override
+public RecordsWithSplitIds<RecordAndPosition<T>> fetch() throws IOException {
+  checkSplitOrStartNext();
+
+  final BulkFormat.RecordIterator<T> nextBatch = currentReader.readBatch();
+  return nextBatch == null
+          ? finishSplit()
+          : FileRecords.forRecords(currentSplitId, nextBatch);
+}
+```
+`BulkFormat`在`HiveSource`构造方法参数中有详细讲解过。
+
