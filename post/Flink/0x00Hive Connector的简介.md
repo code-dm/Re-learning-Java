@@ -1,5 +1,5 @@
 ---
-title: Hive Connector 简介
+title: Flink Hive Connector 简介
 toc: true
 categories:
   - Flink

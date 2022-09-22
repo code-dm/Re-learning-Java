@@ -1,5 +1,5 @@
 ---
-title: Hive Connector创建Catalog的原理
+title: Flink Hive Connector创建Catalog的原理
 toc: true
 categories:
   - Flink
