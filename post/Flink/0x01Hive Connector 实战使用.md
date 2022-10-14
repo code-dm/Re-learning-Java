@@ -154,4 +154,31 @@ WITH (
 )
 
 select * from test_partition /*+ OPTIONS('streaming-source.enable'='true','streaming-source.monitor-interval'='10s') */;
+
+
+
+
+CREATE TABLE IF NOT EXISTS order_orc
+(
+    order_id int,
+    order_date Timestamp,
+    customer_name string,
+    price decimal(10, 5),
+    product_id int,
+    order_status BOOLEAN
+) COMMENT 'order_orc' PARTITIONED BY
+(
+    `order_date_year` string,
+    `order_date_month` string,
+    `order_date_day` string
+)
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+    with serdeproperties('serialization.null.format' = '')
+    STORED AS ORC
+    TBLPROPERTIES
+(
+    "orc.compress"="SNAPPY"
+);
 ```
+
+
