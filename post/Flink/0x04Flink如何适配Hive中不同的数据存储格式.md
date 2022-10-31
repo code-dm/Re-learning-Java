@@ -2,10 +2,11 @@
 title: Flink如何适配Hive中不同的数据存储格式
 toc: true
 categories:
-- Flink
+  - Flink
+abbrlink: 805c09f3
 date: 2022-09-21 11:00:00
 ---
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/11)
 <!-- more --> 
 # Hive支持的数据存储格式
 - TEXT 格式 (行式存储)

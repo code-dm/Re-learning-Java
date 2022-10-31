@@ -7,7 +7,7 @@ abbrlink: 6913f6d4
 date: 2022-07-26 00:00:00
 ---
 
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/6)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/6)
 前两篇文章我们了解了什么是Java以及Java在各个平台的安装过程，这篇起，我们开始快乐的写Java代码，做一个Java程序员。
 <!-- more -->
 ![](pi/Pasted%20image%2020220727214053.png)

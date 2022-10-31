@@ -9,7 +9,7 @@ cover: >-
 abbrlink: f42f2ee6
 date: 2022-07-28 00:00:00
 ---
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/3)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/3)
 # 什么是变量
 ## 变量的定义
 我们由一个停车场示例来讲解什么是变量。

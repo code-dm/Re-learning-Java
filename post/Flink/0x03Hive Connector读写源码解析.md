@@ -6,7 +6,7 @@ categories:
 abbrlink: 76537a8
 date: 2022-09-14 11:00:00
 ---
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/11)
 Flink实现Hive中表数据的读写操作首先要获取到每张表的元数据，通过表的元数据信息才能获取到数据文件的存储路径、存储格式、是否分区、分区规则。这样才能从HDFS对应的路径中获取到对应的数据，并使用对应的存储格式来解析文件。
 Flink Hive的读写同样使用Connector通用架构新Source（[FLIP-27](https://cwiki.apache.org/confluence/display/FLINK/FLIP-27%3A+Refactor+Source+Interface)）和Sink。
 <!-- more -->

@@ -8,7 +8,7 @@ abbrlink: e220ca62
 date: 2022-09-07 11:00:00
 
 ---
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/11)
 <!-- more -->
 > 本文基于：Flink-1.15
 

@@ -25,6 +25,43 @@
       <artifactId>hive-jdbc</artifactId>
       <version>3.0.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+    <!--此依赖是通过本地依赖库导入的，有关如何把jar放入本地依赖库自行搜索-->
+    <!--本人的jar文件是在编译源码时自动到依赖库中的所以直接引用-->
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-avro-serializer</artifactId>
+      <version>5.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-schema-registry-client</artifactId>
+      <version>5.3.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>1.8.2</version>
+    </dependency>
   </dependencies>
+
+  <repositories>
+    <!-- for kafka -->
+    <repository>
+      <id>confluent-io</id>
+      <url>https://packages.confluent.io/maven/</url>
+    </repository>
+
+    <repository>
+      <id>aliyun</id>
+      <url>https://maven.aliyun.com/repository/central</url>
+    </repository>
+  </repositories>
 
 </project>

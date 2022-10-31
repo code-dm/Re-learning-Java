@@ -6,7 +6,7 @@ categories:
 abbrlink: f3b4a32a
 date: 2022-09-07 11:00:00
 ---
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/11)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/11)
 > 本文基于：Flink-1.15
 # 简介什么是Hive
 如果是了解过Hive以及Flink，这些简介请直接跳过。
@@ -40,3 +40,4 @@ Apache Flink是对无界和有界数据流进行计算的一个框架和分布�
   HiveCatalog的设计提供了与 Hive 良好的兼容性，用户可以"开箱即用"的访问其已有的 Hive 数仓。 您不需要修改现有的 Hive Metastore，也不需要更改表的数据位置或分区。
 - 适配Hive的函数
 - 等等
+![如果您喜欢我的文章，请关注我](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221015/f77243a6e59b4a259cfec172cc51943d.png?x-oss-process=style/codedm)

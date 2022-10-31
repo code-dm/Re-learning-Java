@@ -2,7 +2,8 @@
 title: Flink Hive 合并小文件原理
 toc: true
 categories:
-- Flink
+  - Flink
+abbrlink: 573ecee0
 date: 2022-10-11 17:00:00
 ---
 # 服务版本
@@ -68,7 +69,7 @@ Hive中创建分区表，`order_date`订单时间，使用订单时间的年、�
 > - 虽然所有 Hive 版本支持相同的语法，但是一些特定的功能是否可用仍取决于你使用的 [Hive 版本](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/connectors/table/hive/overview/#%e6%94%af%e6%8c%81%e7%9a%84hive%e7%89%88%e6%9c%ac)。例如，更新数据库位置 只在 Hive-2.4.0 或更高版本支持。
 > - Hive 方言主要是在批模式下使用的，某些 Hive 的语法([Sort/Cluster/Distributed BY](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/hive-compatibility/hive-dialect/queries/sort-cluster-distribute-by/), [Transform](https://nightlies.apache.org/flink/flink-docs-release-1.16/zh/docs/dev/table/hive-compatibility/hive-dialect/queries/transform/), 等)还没有在流模式下支持。
 ```sql
-CREATE TABLE IF NOT EXISTS order_orc
+CREATE TABLE IF NOT EXISTS order_orc_no_policy
 (
     order_id int,
     order_date Timestamp,
@@ -85,21 +86,112 @@ CREATE TABLE IF NOT EXISTS order_orc
 )
     ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
     with serdeproperties('serialization.null.format' = '')
+    STORED AS ORC    
+    TBLPROPERTIES
+    (
+    'sink.partition-commit.policy.kind'='metastore,success-file'
+    );
+
+INSERT INTO myhive.yyq.order_orc_no_policy select order_id, order_date, customer_name, price, product_id, order_status, type, `timestamp`, DATE_FORMAT(order_date, 'yyyy-MM-dd'), DATE_FORMAT(order_date, 'HH') from default_catalog.default_database.k_order_read;
+
+CREATE TABLE IF NOT EXISTS order_orc_auto_compaction
+(
+    order_id int,
+    order_date Timestamp,
+    customer_name string,
+    price decimal(10, 5),
+    product_id int,
+    order_status BOOLEAN,
+    op string,
+    `kafka_timestamp` TIMESTAMP
+    ) COMMENT 'order_orc' PARTITIONED BY
+(
+    `order_date_dt` string,
+    `order_date_hr` string
+)
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+    with serdeproperties('serialization.null.format' = '')
+    STORED AS ORC
+    TBLPROPERTIES
+(   'auto-compaction'='true',
+    'compaction.file-size'='128MB',
+    'sink.partition-commit.policy.kind'='metastore,success-file'
+);
+INSERT INTO myhive.yyq.order_orc_auto_compaction select order_id, order_date, customer_name, price, product_id, order_status, type, `timestamp`, DATE_FORMAT(order_date, 'yyyy-MM-dd'), DATE_FORMAT(order_date, 'HH') from default_catalog.default_database.k_order_read;
+
+
+
+CREATE TABLE IF NOT EXISTS order_orc_partition_commit
+(
+    order_id int,
+    order_date Timestamp,
+    customer_name string,
+    price decimal(10, 5),
+    product_id int,
+    order_status BOOLEAN,
+    op string,
+    `kafka_timestamp` TIMESTAMP
+    ) COMMENT 'order_orc' PARTITIONED BY
+(
+    `order_date_dt` string,
+    `order_date_hr` string,
+    `order_date_min` string
+)
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+    with serdeproperties('serialization.null.format' = '')
     STORED AS ORC
     TBLPROPERTIES
 (
-    'partition.time-extractor.timestamp-pattern'='$order_date_dt $order_date_hr:00:00',
-    'sink.partition-commit.trigger'='partition-time',
-    'sink.partition-commit.delay'='3 m',
+    'sink.partition-commit.trigger'='process-time',
+    'sink.partition-commit.delay'='0s',
     'sink.partition-commit.watermark-time-zone'='Asia/Shanghai',
-    'sink.partition-commit.policy.kind'='metastore,success-file'
+    'sink.partition-commit.policy.kind'='metastore,success-file',
+    'sink.parallelism'='5'
 );
+
+INSERT INTO myhive.yyq.order_orc_partition_commit select order_id, order_date, customer_name, price, product_id, order_status, type, `timestamp`, DATE_FORMAT(order_date, 'yyyy-MM-dd'), DATE_FORMAT(order_date, 'HH'), DATE_FORMAT(order_date, 'mm') from default_catalog.default_database.k_order_read;
+
+
+CREATE TABLE IF NOT EXISTS order_orc_partition_commit_and_auto_compaction
+(
+    order_id int,
+    order_date Timestamp,
+    customer_name string,
+    price decimal(10, 5),
+    product_id int,
+    order_status BOOLEAN,
+    op string,
+    `kafka_timestamp` TIMESTAMP
+    ) COMMENT 'order_orc' PARTITIONED BY
+(
+    `order_date_dt` string,
+    `order_date_hr` string,
+    `order_date_min` string
+)
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+    with serdeproperties('serialization.null.format' = '')
+    STORED AS ORC
+    TBLPROPERTIES
+(
+    'sink.partition-commit.trigger'='process-time',
+    'sink.partition-commit.delay'='0s',
+    'sink.partition-commit.watermark-time-zone'='Asia/Shanghai',
+    'sink.partition-commit.policy.kind'='metastore,success-file',
+    
+    'sink.parallelism'='3',
+
+    'auto-compaction'='true',
+    'compaction.file-size'='128MB'
+);
+
+INSERT INTO myhive.yyq.order_orc_partition_commit_and_auto_compaction select order_id, order_date, customer_name, price, product_id, order_status, type, `timestamp`, DATE_FORMAT(order_date, 'yyyy-MM-dd'), DATE_FORMAT(order_date, 'HH'), DATE_FORMAT(order_date, 'mm') from default_catalog.default_database.k_order_read;
+
 ```
 # 开始同步
 > 同步之前请确保`SQL Client`已经注册Hive CATALOG，Flink CDC可以正常访问MySQL。
 ```sql
 -- 设置checkpoint间隔时间为10s，生产环境建议2-3分钟 
-SET 'execution.checkpointing.interval' = '10s';
+SET 'execution.checkpointing.interval' = '10m';
     
 -- 创建连接MySQL BinLog的Flink表
 CREATE TABLE f_order (
@@ -153,7 +245,7 @@ CREATE TABLE k_order_write_canal(
     'properties.allow.auto.create.topics' = 'true'
     );
 -- 将 MySQL BinLog数据写入 Kafka中
-insert into k_order_write select * from f_order;
+insert into k_order_write_canal select * from f_order;
 ```
 将数据从Kafka中同步到Hive
 ```sql
@@ -198,3 +290,32 @@ INSERT INTO myhive.yyq.order_orc select order_id, order_date, customer_name, pri
 select * from (select order_id, max(kafka_timestamp) as tp from order_orc group by order_id) t 
  join order_orc oc on t.order_id = oc.order_id and t.tp = oc.kafka_timestamp where oc.op != 'DELETE';
 ```
+# 配置解析
+我们在创建Hive表的时候增加了几个特殊的配置：
+```
+'partition.time-extractor.timestamp-pattern'='$order_date_dt $order_date_hr:00:00',
+'sink.partition-commit.trigger'='partition-time',
+'sink.partition-commit.delay'='3 m',
+'sink.partition-commit.watermark-time-zone'='Asia/Shanghai',
+'sink.partition-commit.policy.kind'='metastore,success-file'
+```
+- `partition.time-extractor.timestamp-pattern`
+- `sink.partition-commit.trigger`
+- `sink.partition-commit.delay`
+- `sink.partition-commit.watermark-time-zone`
+- `sink.partition-commit.policy.kind`
+
+![no_policy生成的文件](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221018/a715b76a886546d194a7e9b72835afb7.png?x-oss-process=style/codedm)
+![no_policy文件生成含文件大小](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221018/e2d4a721124e40bb98890af606adbef2.png?x-oss-process=style/codedm)
+
+![开启自动压缩DAG图](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221018/1229460276724ee1834e50338e7e7d5d.png?x-oss-process=style/codedm)
+![开启自动压缩，生成的文件列表](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221018/46c829bd14a24e21821f173527c69a2c.png?x-oss-process=style/codedm)
+
+![并行度为5的DAG图](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221025/0df1fb0406604a0b88f5fdb779d3d0ed.png?x-oss-process=style/codedm)
+![并行度为5生成的文件列表](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221025/01bd3b77058c4c009c8590129fd03919.png?x-oss-process=style/codedm)
+
+![开启自动压缩和分区提交DAG图](https://codedm.oss-cn-hangzhou.aliyuncs.com/images/20221031/1e81c06c997c41f29304b7f16e204e02.png?x-oss-process=style/codedm)
+
+
+
+

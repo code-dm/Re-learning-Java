@@ -9,7 +9,7 @@ abbrlink: 823e9fb
 date: 2022-07-25 00:00:00
 ---
 
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/1)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/1)
 
 <!-- more -->
 

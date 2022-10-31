@@ -9,7 +9,7 @@ abbrlink: fd4a56f1
 date: 2022-08-08 23:02:00
 ---
 
-[本篇文章对应的Issues](https://github.com/Code-dm/Re-learning-Java/issues/7)
+[本篇文章对应的Issues，Issues代表我文章创作的过程。(点击我)](https://github.com/Code-dm/Re-learning-Java/issues/7)
 面向对象OOP（Object-oriented programming）
 <!-- more -->
 # 面向过程 Process-oriented programming, POP
