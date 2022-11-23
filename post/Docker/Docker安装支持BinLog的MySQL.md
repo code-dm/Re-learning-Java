@@ -52,7 +52,7 @@ default-time-zone='+08:00'
 ```shell
 docker run -p 3308:3306 \
 --name mysql-binlog \
--v /Users/wudongming/code/docker/mysql-conf/my.cnf:/etc/mysql/my.cnf \
+-v 修改成你本机绝对路径/my.cnf:/etc/mysql/my.cnf \
 -e MYSQL_ROOT_PASSWORD=123456 \
 -d \
 mysql:5.7.34

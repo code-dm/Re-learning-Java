@@ -124,7 +124,7 @@ set hive.exec.dynamic.partition.mode=nonstrict;
 insert into table yyq.test_partition partition(dt='2022-09-20')values('4','test_partition');
 
 
-CREATE TABLE IF NOT EXISTS yyq.test_stream_orc
+CREATE TABLE IF NOT EXISTS test_stream_orc
 (
   id string comment 'id',
   name string  comment 'name'
