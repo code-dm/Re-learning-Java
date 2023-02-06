@@ -191,7 +191,7 @@ INSERT INTO myhive.yyq.order_orc_partition_commit_and_auto_compaction select ord
 > 同步之前请确保`SQL Client`已经注册Hive CATALOG，Flink CDC可以正常访问MySQL。
 ```sql
 -- 设置checkpoint间隔时间为10s，生产环境建议2-3分钟 
-SET 'execution.checkpointing.interval' = '10m';
+SET 'execution.checkpointing.interval' = '30s';
     
 -- 创建连接MySQL BinLog的Flink表
 CREATE TABLE f_order (
@@ -204,12 +204,16 @@ CREATE TABLE f_order (
      PRIMARY KEY(order_id) NOT ENFORCED
      ) WITH (
      'connector' = 'mysql-cdc',
-     'hostname' = '192.168.72.233',
+     'hostname' = '192.168.80.92',
      'port' = '3308',
      'username' = 'root',
      'password' = '123456',
      'database-name' = 'db_order',
      'table-name' = 't_order');
+
+select * from f_order;
+
+SET 'execution.savepoint.path' = 'hdfs://dn8092:8020/flink/checkpoints/fd2b980717b5ca23efb1be219bdd8c14/chk-3';
 ```
 测试Flink CDC能不能正常获取MySQL的BinLog。
 ```sql

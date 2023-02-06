@@ -2,7 +2,8 @@
 title: Flink CheckPoint 使用以及原理
 toc: true
 categories:
-- Docker
+  - Flink
+abbrlink: fed98383
 date: 2022-07-24 00:00:00
 ---
 
